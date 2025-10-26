@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kaspar Besthorn</title>
+    <meta name="description" content="A simple, self-editable portfolio page." />
+    <style>
+        :root{
+            --bg:#0b0d10;--panel:#12161b;--text:#e8edf2;--muted:#a7b0bb;
+            --accent:#5bbcff;--accent-2:#89f7fe;--ring:rgba(91,188,255,.35);--border:#1e242c;
+            /* anchor offset gets measured in JS */
+            --anchor-offset: 110px;
+        }
+        *{box-sizing:border-box}
+        html,body{height:100%}
+        html{scroll-behavior:smooth}
+        body{
+            margin:0;font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial;
+            background:linear-gradient(180deg,var(--bg),#0d1117 30%,#0d1117);
+            color:var(--text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale
+        }
+        a{color:var(--accent);text-decoration:none}
+        a:hover{text-decoration:underline}
+        .wrap{max-width:1024px;margin:0 auto;padding:28px 20px 60px}
+
+        header{
+            display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;
+            padding:16px 18px;border:1px solid var(--border);border-radius:16px;
+            background:
+                    radial-gradient(1200px 600px at 10% -20%,rgba(137,247,254,.08),transparent 60%),
+                    linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,0));
+            position:sticky;top:12px;z-index:5;backdrop-filter:blur(4px)
+        }
+        .brand{display:grid;gap:6px}
+        .brand h1{margin:0;font-size:22px;letter-spacing:.3px}
+        .brand p{margin:0;color:var(--muted);font-size:14px}
+
+        nav{display:flex;gap:14px;flex-wrap:wrap}
+        nav a{padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:#0e1319}
+        nav a:hover{background:#101722}
+
+        section{
+            margin-top:26px;border:1px solid var(--border);border-radius:16px;padding:20px;
+            background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,0));
+            /* main fix: browsers that support it */
+            scroll-margin-top: calc(var(--anchor-offset) + 8px);
+            position: relative;
+        }
+        /* bulletproof anchor offset (also works on direct hash loads) */
+        section:target::before{
+            content:"";display:block;height:var(--anchor-offset);margin-top:calc(var(--anchor-offset) * -1);
+        }
+
+        h2{margin:0 0 12px;font-size:18px;letter-spacing:.25px}
+        .muted{color:var(--muted)}
+
+        /* Skills / Projects / Cards */
+        .skills{display:grid;gap:12px}
+        .skill{display:grid;grid-template-columns:120px 1fr auto;gap:12px;align-items:center}
+        .skill-name{color:var(--text)}
+        .bar{height:10px;border-radius:999px;background:#0f141a;border:1px solid var(--border);overflow:hidden}
+        .bar>span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));
+            box-shadow:0 0 0 4px var(--ring) inset;transition:width 600ms ease}
+        .skill-pct{font-variant-numeric:tabular-nums;color:var(--muted)}
+        .projects{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+        .card{border:1px solid var(--border);border-radius:14px;padding:14px;background:#0e1319}
+        .card h3{margin:0 0 6px;font-size:16px}
+        .card p{margin:0 0 10px;color:var(--muted)}
+        .tags{display:flex;gap:6px;flex-wrap:wrap}
+        .tag{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid var(--border);color:var(--muted)}
+
+        /* Chess boxes */
+        .chess-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+        .kv{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+
+        /* === Side-by-side timelines with a spine, dots, arrows, numbering === */
+        .two-col{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+        .timeline{position:relative;padding-left:32px;counter-reset:step}
+        .timeline::before{
+            content:"";position:absolute;left:16px;top:0;bottom:0;width:2px;border-radius:2px;
+            background:
+                    linear-gradient(180deg,rgba(137,247,254,.55),rgba(91,188,255,.25) 40%,rgba(137,247,254,.08));
+            box-shadow:0 0 12px rgba(91,188,255,.25);
+        }
+        .tevent{
+            position:relative;margin-bottom:16px;border:1px solid var(--border);border-radius:12px;
+            padding:12px 12px 12px 14px;background:#0e1319;
+            /* accent stripe */
+            box-shadow:inset 4px 0 0 0 var(--accent);
+        }
+        .tevent:last-child{margin-bottom:0}
+        /* numbered dot on the spine */
+        .tevent::before{
+            counter-increment:step;content:counter(step);
+            position:absolute;left:-32px;top:14px;width:22px;height:22px;border-radius:999px;
+            display:grid;place-items:center;font-size:12px;font-weight:600;
+            background:var(--panel);border:2px solid var(--accent);color:var(--text);
+            box-shadow:0 0 0 4px var(--ring);
+        }
+        /* down-arrow between items (on the spine) */
+        .tevent:not(:last-child)::after{
+            content:"";position:absolute;left:-23px;bottom:-14px;width:0;height:0;
+            border-left:8px solid transparent;border-right:8px solid transparent;border-top:10px solid var(--accent);
+            opacity:.8;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25));
+        }
+        .tmeta{font-size:12px;color:var(--muted);margin-bottom:6px}
+        .title{font-weight:600}
+        details summary{cursor:pointer;list-style:none}
+        details summary::-webkit-details-marker{display:none}
+        .inline-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+
+        /* Hobbies */
+        .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+        .filter-btn{border:1px solid var(--border);background:#0e1319;border-radius:999px;padding:6px 10px;font-size:14px;cursor:pointer}
+        .filter-btn[aria-pressed="true"]{outline:2px solid var(--ring);background:#101722}
+        .hobby-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+
+        footer{text-align:center;margin-top:26px;color:var(--muted)}
+        .notice{border:1px dashed var(--border);color:var(--muted);border-radius:12px;padding:10px;background:#0b1117}
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <header>
+        <div class="brand">
+            <h1 id="brand-name">Kaspar Besthorn</h1>
+            <p id="brand-role" class="muted">Your Role • Your Location</p>
+        </div>
+        <nav>
+            <a href="#about">About</a>
+            <a href="#skills">Skills</a>
+            <a href="#projects">Projects</a>
+            <a href="#journey">Journey</a>
+            <a href="#chess">Chess</a>
+            <a href="#hobbies">Hobbies</a>
+            <a href="#links">Links</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+
+    <section id="about" class="about">
+        <h2>About the amazing me</h2>
+        <p id="about-text" class="muted">Short bio goes here.</p>
+    </section>
+
+    <section id="skills">
+        <h2>Programming Skills</h2>
+        <div id="skills-list" class="skills"></div>
+    </section>
+
+    <section id="projects">
+        <h2>Projects</h2>
+        <div id="projects-grid" class="projects"></div>
+    </section>
+
+    <!-- Side-by-side timelines -->
+    <section id="journey">
+        <h2>My Journeys in programming and chess</h2>
+        <p class="muted" style="margin-bottom:10px">Parallel storylines for programming and chess. Edit items in the JSON.</p>
+        <div class="two-col">
+            <div>
+                <h3 style="margin:0 0 8px">Programming</h3>
+                <div id="prog-tl" class="timeline"></div>
+            </div>
+            <div>
+                <h3 style="margin:0 0 8px">Chess</h3>
+                <div id="chess-tl" class="timeline"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="chess">
+        <h2>Chess</h2>
+        <div id="chess-warning" class="notice" style="display:none"></div>
+        <div class="chess-grid">
+            <div class="card">
+                <h3>FIDE</h3>
+                <div id="fide-content" class="muted">Provide a FIDE ID in the data below to show ratings and a profile link.</div>
+            </div>
+            <div class="card">
+                <h3>Chess.com</h3>
+                <div id="chesscom-content" class="muted">Provide a Chess.com username in the data below to show ratings and a profile link.</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="hobbies">
+        <h2>Hobbies</h2>
+        <p class="muted" style="margin-bottom:10px">Mix and match Chess + Programming (or just one). Filter below.</p>
+        <div class="filters">
+            <button class="filter-btn" data-tag="All" aria-pressed="true">All</button>
+            <button class="filter-btn" data-tag="Programming" aria-pressed="false">Programming</button>
+            <button class="filter-btn" data-tag="Chess" aria-pressed="false">Chess</button>
+        </div>
+        <div id="hobby-grid" class="hobby-grid"></div>
+    </section>
+
+    <section id="links">
+        <h2>Links</h2>
+        <div id="links-list" class="links"></div>
+    </section>
+
+    <section id="contact">
+        <h2>Contact</h2>
+        <p class="muted">Email: <a id="contact-email" href="#"></a></p>
+    </section>
+
+    <!--<footer>
+      <small>© <span id="year"></span> <span id="footer-name">Your Name</span>. Built with plain HTML/CSS/JS.</small>
+    </footer>-->
+</div>
+
+<!-- Editable data -->
+<script type="application/json" id="site-data">
+    {
+        "site": {
+            "name": "Kaspar Besthorn",
+            "role": "Business Informatics Student",
+            "location": "Hamburg / Munich, DE",
+            "email": "kaspar@besthorn.de",
+            "bio": ["Hey, I am Kaspar! I am 19 years old and just started my studies in Business Informatics at TUM. I think I would be best described by my friends,",
+                "but I will try my fair shair. I started programming when I was 7 years old guided well by my dad through the intense world of Scratch.",
+                "Over time I went through various projects and languages, being interested in only the biggest ideas I could think of myself. I must admit ",
+                "that in the past most walls I would hit would lead me on to the next big idea. Nowadays I am developing a project integrating most of ",
+                "my amazing ideas of the past years, trying to improve school life of kids that are in the final years before graduation. More to read down below!",
+                "In school I most enjoyed Maths, from an early age I was always, let's say not dumb-founded when it comes to math. That really led me to enjoy logic",
+                "of math puzzles, being motivated by solving them. These days I wonder why I didn't start chess earlier, but I got hooked during lockdown in 2021, playing with",
+                "my best friend, where we followed a similar path of always wanting to beat each other. Now I can proudly say I have a slight edge. These are the things that I",
+                "would say shape me the most, of course I would say my friends shaped me the most, but that would be a long text describing each of them.",
+                " I put a story line down concerning my programming and chess journey, so feel free to check it out. I always love to connect with new people,",
+                "that are interesting and innovative, so if that is you and you are reading this, don't hesitate to reach out!"
+            ]
+        },
+        "skills": [
+            { "name": "JavaScript", "level": 80 },
+            { "name": "TypeScript", "level": 70 },
+            { "name": "React", "level": 70 },
+            { "name": "Node.js", "level": 65 },
+            { "name": "Python", "level": 75 },
+            { "name": "SQL", "level": 60 }
+        ],
+        "projects": [
+            {
+                "title": "Portfolio Website",
+                "description": "This page. Single-file, self-editable portfolio.",
+                "link": "#",
+                "tags": ["HTML", "CSS", "JS"]
+            },
+            {
+                "title": "Task Timer",
+                "description": "A browser-based pomodoro timer with keyboard shortcuts.",
+                "link": "#",
+                "tags": ["Productivity", "Web"]
+            }
+        ],
+        "links": {
+            "linkedin": "https://www.linkedin.com/in/your-handle",
+            "github": "https://github.com/your-handle",
+            "hackerrank": "https://www.hackerrank.com/your-handle",
+            "leetcode": "https://leetcode.com/your-handle"
+        },
+        "chess": {
+            "fideid": "34684220",
+            "chesscom": "clickybtw"
+        },
+        "story": {
+            "programming": [
+                { "date":"2013","title":"First Introduction to programming","summary":"Scratch","details":[],"links":[]},
+                { "date":"2015","title":"Php application-server","details":"PHP"},
+                { "date":"2016","title":"Database mysql programming","summary":"SQL"},
+                { "date":"2017","title":"Linux & Raspberry Pi hacking","summary":"Node + Express + SQL.","details":"REST APIs, auth, migrations, logging."},
+                { "date":"2020","title":"Webpages","summary":"Node + Express + SQL.","details":"REST APIs, auth, migrations, logging."},
+                { "date":"2021","title":"Philips Hue Home Automation","summary":"Node + Express + SQL.","details":"REST APIs, auth, migrations, logging."},
+                { "date":"2023","title":"Discord Bot","summary":"Node + Express + SQL.","details":"REST APIs, auth, migrations, logging."},
+                { "date":"2025","title":"Godot Study Game","summary":"Node + Express + SQL.","details":"REST APIs, auth, migrations, logging."}
+            ],
+            "chess": [
+                { "date":"2021","title":"Started Playing Chess Online","summary":"Blitz with friends.","details":"Accuracy tracking + friendly rivalry.","links":[{"text":"Profile","href":"https://www.chess.com/member/clickybtw"}]},
+                { "date":"2022","title":"House Championship","summary":"Daily puzzles; fewer traps.","details":"Switched to annotated rapid games."},
+                { "date":"2024","title":"First Tournament","summary":"Local events + FIDE ID.","details":"Classical games = patience + time mgmt."},
+                { "date":"2024","title":"Won Hamburg school chess championship","summary":"Local events + FIDE ID.","details":"Classical games = patience + time mgmt."},
+                { "date":"2024","title":"Participated in German school chess championship","summary":"Local events + FIDE ID.","details":"Classical games = patience + time mgmt."}
+            ]
+        },
+        "hobbies": [
+            {"title":"Hockey","date":"2024-06","tags":["Programming","Chess"],"summary":"PGN viewer with stepper.","details":"Bitboards & UI experiments.","link":"#"},
+            {"title":"Skating","date":"2023-10","tags":["Chess"],"summary":"Short, practical lines.","details":"One novelty per line."},
+            {"title":"Tennis","date":"2022-02","tags":["Programming"],"summary":"Tiny TUI for daily streaks.","details":"CSV + git, no cloud.","link":"#"}
+        ]
+    }
+</script>
+
+<script>
+    // ===== Helpers
+    const $ = (s)=>document.querySelector(s);
+    const el=(t,c)=>{const n=document.createElement(t); if(c) n.className=c; return n;};
+    const safeUrl=(u)=>{try{return new URL(u).href;}catch{return '#';}};
+    const setText=(s,t)=>{const n=$(s); if(n) n.textContent=t;};
+
+    // ===== Robust sticky-header offset
+    function measureHeaderOffset(){
+        const header = document.querySelector('header');
+        if(!header) return;
+        const stickyTop = parseFloat(getComputedStyle(header).top) || 0; // usually 12px
+        const hh = Math.ceil(header.getBoundingClientRect().height + stickyTop + 12); // buffer
+        document.documentElement.style.setProperty('--anchor-offset', hh + 'px');
+    }
+    function setupAnchorClicks(){
+        document.querySelectorAll('nav a[href^="#"]').forEach(a=>{
+            a.addEventListener('click', (e)=>{
+                const id=a.getAttribute('href');
+                const target=document.querySelector(id);
+                if(!target) return;
+                e.preventDefault();
+                const off=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--anchor-offset'))||0;
+                const y=target.getBoundingClientRect().top + window.pageYOffset - off;
+                window.scrollTo({top:y,behavior:'smooth'});
+                history.pushState(null,'',id);
+            });
+        });
+        // Re-measure on resize/font load
+        window.addEventListener('resize', measureHeaderOffset, {passive:true});
+        if(document.fonts && document.fonts.ready){ document.fonts.ready.then(measureHeaderOffset); }
+    }
+    function correctOnInitialHash(){
+        if(location.hash){
+            // allow layout to settle
+            setTimeout(()=>{
+                const off=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--anchor-offset'))||0;
+                const target=document.querySelector(location.hash);
+                if(target){
+                    const y=target.getBoundingClientRect().top + window.pageYOffset - off;
+                    window.scrollTo(0,y);
+                }
+            }, 50);
+        }
+    }
+
+    // ===== Renderers
+    function renderSkills(skills){
+        const list=$('#skills-list'); list.innerHTML='';
+        skills.forEach(s=>{
+            const row=el('div','skill');
+            const name=el('div','skill-name'); name.textContent=s.name;
+            const bar=el('div','bar'); const fill=el('span'); bar.appendChild(fill);
+            const pct=el('div','skill-pct');
+            const val=Math.max(0,Math.min(100,Number(s.level)||0));
+            pct.textContent=val+'%';
+            row.append(name,bar,pct); list.appendChild(row);
+            requestAnimationFrame(()=>{ fill.style.width=val+'%';});
+        });
+    }
+    function renderProjects(projects){
+        const grid=$('#projects-grid'); grid.innerHTML='';
+        projects.forEach(p=>{
+            const card=el('div','card');
+            const h3=el('h3'); h3.textContent=p.title;
+            const d=el('p'); d.textContent=p.description||'';
+            const tags=el('div','tags');
+            (p.tags||[]).forEach(t=>{const tag=el('span','tag');tag.textContent=t;tags.appendChild(tag);});
+            const a=el('a'); a.href=safeUrl(p.link||'#'); a.textContent='Open →';
+            card.append(h3,d,tags,a); grid.appendChild(card);
+        });
+    }
+    function renderLinks(links){
+        const wrap=$('#links-list'); wrap.innerHTML='';
+        const entries=Object.entries(links||{});
+        if(!entries.length){wrap.textContent='Add your links in the data block to show them here.'; return;}
+        for(const [name,url] of entries){
+            const a=el('a','pill'); a.href=safeUrl(url); a.rel='me noopener noreferrer'; a.target='_blank';
+            a.textContent=name.charAt(0).toUpperCase()+name.slice(1); wrap.appendChild(a);
+        }
+    }
+
+    // ===== Side-by-side timelines
+    function renderTimeline(items, mountId){
+        const mount=$(mountId); mount.innerHTML='';
+        if(!Array.isArray(items) || !items.length){
+            mount.innerHTML='<p class="muted">Add entries in the JSON to show your journey.</p>'; return;
+        }
+        items.forEach((it,i)=>{
+            const card=el('div','tevent');
+            const meta=el('div','tmeta'); meta.textContent=it.date||'';
+            const title=el('div','title'); title.innerHTML = `${it.title||''} — <span class="muted">${it.summary||''}</span>`;
+            card.append(meta,title);
+
+            if(it.details || (it.links && it.links.length)){
+                const det=document.createElement('details');
+                const sum=document.createElement('summary'); sum.textContent='Read more';
+                const body=document.createElement('div'); body.style.marginTop='8px'; body.textContent=it.details||'';
+                det.append(sum,body);
+                if(it.links && it.links.length){
+                    const bar=el('div','inline-links');
+                    it.links.forEach(l=>{
+                        const a=document.createElement('a'); a.href=safeUrl(l.href||'#'); a.target='_blank'; a.rel='noopener';
+                        a.textContent=l.text||'Link'; bar.appendChild(a);
+                    });
+                    det.appendChild(bar);
+                }
+                card.appendChild(det);
+            }
+            mount.appendChild(card);
+        });
+    }
+
+    // ===== Hobbies (filterable)
+    let activeTag='All';
+    function renderHobbies(items){
+        const grid=$('#hobby-grid'); grid.innerHTML='';
+        if(!Array.isArray(items) || !items.length){ grid.innerHTML='<p class="muted">Add some hobbies in the JSON to show them here.</p>'; return; }
+        const filtered = activeTag==='All' ? items : items.filter(x=>(x.tags||[]).includes(activeTag));
+        filtered.forEach(h=>{
+            const card=el('div','card');
+            const h3=el('h3'); h3.textContent=h.title||'';
+            const meta=el('div'); meta.className='tmeta'; meta.textContent=h.date||'';
+            const p=el('p'); p.textContent=h.summary||'';
+            card.append(h3,meta,p);
+            if(h.details || (h.tags&&h.tags.length) || h.link){
+                const det=document.createElement('details');
+                const sum=document.createElement('summary'); sum.textContent='Details';
+                const body=document.createElement('div'); body.style.marginTop='8px'; body.textContent=h.details||'';
+                det.append(sum,body);
+                if(h.tags && h.tags.length){
+                    const tags=el('div','tags'); h.tags.forEach(t=>{const tag=el('span','tag'); tag.textContent=t; tags.appendChild(tag);});
+                    det.appendChild(tags);
+                }
+                if(h.link){
+                    const a=document.createElement('a'); a.href=safeUrl(h.link); a.target='_blank'; a.rel='noopener';
+                    a.style.display='inline-block'; a.style.marginTop='8px'; a.textContent='Open →'; det.appendChild(a);
+                }
+                card.appendChild(det);
+            }
+            grid.appendChild(card);
+        });
+    }
+    function setupHobbyFilters(hobbies){
+        document.querySelectorAll('.filter-btn').forEach(btn=>{
+            btn.addEventListener('click',()=>{
+                document.querySelectorAll('.filter-btn').forEach(b=>b.setAttribute('aria-pressed','false'));
+                btn.setAttribute('aria-pressed','true');
+                activeTag=btn.dataset.tag; renderHobbies(hobbies);
+            });
+        });
+    }
+
+    // ===== Chess integrations
+    async function fetchJSON(url, opts={}){ const res=await fetch(url,{headers:{'Accept':'application/json'},...opts}); if(!res.ok) throw new Error('HTTP '+res.status); return await res.json(); }
+    async function renderFide(FideId){
+        const target=$('#fide-content');
+        if(!FideId){ target.textContent='Provide a FIDE ID in the data to show ratings.'; return; }
+        try{
+            const data=await fetchJSON(`https://fide-api.vercel.app/player_info/?fide_id=${encodeURIComponent(FideId)}&history=false`);
+            target.innerHTML=`
+        <div class="kv"><span>Standard</span><strong>${data.classical_rating ?? '—'}</strong></div>
+        <div class="kv"><span>Rapid</span><strong>${data.rapid_rating ?? '—'}</strong></div>
+        <div class="kv"><span>National Ranking</span><strong>${data.national_rank_active ?? '—'}</strong></div>
+        <div class="kv"><span>FIDE ID</span><a href="https://ratings.fide.com/profile/${FideId}" target="_blank" rel="noopener">${FideId}</a></div>
+      `;
+        } catch{ target.textContent='Could not load FIDE data.'; }
+    }
+    async function renderChessCom(username){
+        const target=$('#chesscom-content');
+        if(!username){ target.textContent='Provide a Chess.com username in the data to show ratings.'; return; }
+        try{
+            const stats=await fetchJSON(`https://api.chess.com/pub/player/${encodeURIComponent(username)}/stats`);
+            const rating=(o)=>o?.last?.rating||o?.best?.rating||'—';
+            target.innerHTML=`
+        <div class="kv"><span>Bullet</span><strong>${rating(stats.chess_bullet)}</strong></div>
+        <div class="kv"><span>Blitz</span><strong>${rating(stats.chess_blitz)}</strong></div>
+        <div class="kv"><span>Rapid</span><strong>${rating(stats.chess_rapid)}</strong></div>
+        <div class="kv"><span>User</span><a href="https://www.chess.com/member/${username}" target="_blank" rel="noopener">@${username}</a></div>
+      `;
+        } catch{ target.textContent='Could not load Chess.com data.'; }
+    }
+    function maybeShowCORSWarning(){
+        if(location.protocol==='file:'){
+            const w=$('#chess-warning'); w.style.display='block';
+            w.textContent='When I first discovered chess I was about 14 years old. ... (CORS note placeholder text).';
+        }
+    }
+
+    // ===== Boot
+    (function init(){
+        setText('#year', new Date().getFullYear());
+        measureHeaderOffset(); setupAnchorClicks(); correctOnInitialHash();
+        // measure again once layout settles
+        setTimeout(measureHeaderOffset, 100);
+
+        try{
+            const cfg = JSON.parse(document.getElementById('site-data').textContent.trim());
+            // Header / About
+            setText('#brand-name', cfg.site?.name || 'Your Name');
+            setText('#footer-name', cfg.site?.name || 'Your Name');
+            setText('#brand-role', [cfg.site?.role, cfg.site?.location].filter(Boolean).join(' • '));
+            const email = cfg.site?.email || '';
+            const emailEl = document.getElementById('contact-email');
+            emailEl.textContent = email || 'you@example.com';
+            emailEl.href = email ? `mailto:${email}` : '#';
+            const bioData = cfg.site?.bio;
+            const bioText = Array.isArray(bioData) ? bioData.join('\n\n') : (bioData );
+            setText('#about-text', bioText);
+
+            // Skills / Projects / Links
+            renderSkills(cfg.skills || []); renderProjects(cfg.projects || []); renderLinks(cfg.links || {});
+
+            // Timelines (side-by-side)
+            renderTimeline(cfg.story?.programming || [], '#prog-tl');
+            renderTimeline(cfg.story?.chess || [], '#chess-tl');
+
+            // Hobbies
+            setupHobbyFilters(cfg.hobbies || []); renderHobbies(cfg.hobbies || []);
+
+            // Chess
+            maybeShowCORSWarning(); renderFide(cfg.chess?.fideid || ''); renderChessCom(cfg.chess?.chesscom || '');
+        }catch(e){
+            console.error('Bad JSON in #site-data', e);
+            alert('There is an error in the JSON data block. Please fix it.');
+        }
+    })();
+</script>
+</body>
+</html>
