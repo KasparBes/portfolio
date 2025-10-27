@@ -4,8 +4,38 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Kaspar Besthorn</title>
-    <meta name="description" content="A simple, self-editable portfolio page." />
+    <meta name="description" content="Kaspar Besthorn - portfolio" />
     <style>
+        /* Links section layout + pill styling */
+        #links-list{
+            display:flex;
+            gap:10px;
+            flex-wrap:wrap;
+            margin-top:6px;
+        }
+
+        #links-list .pill{
+            display:inline-block;
+            padding:8px 12px;
+            border:1px solid var(--border);
+            border-radius:999px;
+            background:#0e1319;
+            color:var(--text);
+            text-decoration:none;
+            transition:transform .15s ease, background .2s ease, box-shadow .2s ease;
+        }
+
+        #links-list .pill:hover{
+            background:#101722;
+            text-decoration:none;
+            transform:translateY(-1px);
+            box-shadow:0 0 0 4px var(--ring);
+        }
+
+        #links-list .pill:focus-visible{
+            outline:none;
+            box-shadow:0 0 0 4px var(--ring);
+        }
         :root{
             --bg:#0b0d10;--panel:#12161b;--text:#e8edf2;--muted:#a7b0bb;
             --accent:#5bbcff;--accent-2:#89f7fe;--ring:rgba(91,188,255,.35);--border:#1e242c;
@@ -129,11 +159,11 @@
         </div>
         <nav>
             <a href="#about">About</a>
-            <a href="#skills">Skills</a>
-            <a href="#projects">Projects</a>
+            <!--<a href="#skills">Skills</a>-->
+            <!--<a href="#projects">Projects</a>-->
             <a href="#journey">Journey</a>
-            <a href="#chess">Chess</a>
-            <a href="#hobbies">Hobbies</a>
+            <a href="#chess">Stats</a>
+            <!--<a href="#hobbies">Hobbies</a>-->
             <a href="#links">Links</a>
             <a href="#contact">Contact</a>
         </nav>
@@ -144,20 +174,20 @@
         <p id="about-text" class="muted">Short bio goes here.</p>
     </section>
 
-    <section id="skills">
+    <!--<section id="skills">
         <h2>Programming Skills</h2>
         <div id="skills-list" class="skills"></div>
-    </section>
+    </section>-->
 
-    <section id="projects">
+    <!--<section id="projects">
         <h2>Projects</h2>
         <div id="projects-grid" class="projects"></div>
-    </section>
+    </section>-->
 
     <!-- Side-by-side timelines -->
     <section id="journey">
-        <h2>My Journeys in programming and chess</h2>
-        <p class="muted" style="margin-bottom:10px">Parallel storylines for programming and chess. Edit items in the JSON.</p>
+        <h2>My journey in programming and chess</h2>
+        <!--<p class="muted" style="margin-bottom:10px">Parallel storylines for programming and chess. Edit items in the JSON.</p>-->
         <div class="two-col">
             <div>
                 <h3 style="margin:0 0 8px">Programming</h3>
@@ -171,7 +201,7 @@
     </section>
 
     <section id="chess">
-        <h2>Chess</h2>
+        <h2>My statistics</h2>
         <div id="chess-warning" class="notice" style="display:none"></div>
         <div class="chess-grid">
             <div class="card">
@@ -185,7 +215,7 @@
         </div>
     </section>
 
-    <section id="hobbies">
+    <!--<section id="hobbies">
         <h2>Hobbies</h2>
         <p class="muted" style="margin-bottom:10px">Mix and match Chess + Programming (or just one). Filter below.</p>
         <div class="filters">
@@ -194,7 +224,7 @@
             <button class="filter-btn" data-tag="Chess" aria-pressed="false">Chess</button>
         </div>
         <div id="hobby-grid" class="hobby-grid"></div>
-    </section>
+    </section>-->
 
     <section id="links">
         <h2>Links</h2>
@@ -220,7 +250,7 @@
             "location": "Hamburg / Munich, DE",
             "email": "kaspar@besthorn.de",
             "bio": ["Hey, I am Kaspar! I am 19 years old and just started my studies in Business Informatics at TUM. I think I would be best described by my friends,",
-                "but I will try my fair shair. I started programming when I was 7 years old guided well by my dad through the intense world of Scratch.",
+                "but I will try my fair share. I started programming when I was 7 years old guided well by my dad through the intense world of Scratch.",
                 "Over time I went through various projects and languages, being interested in only the biggest ideas I could think of myself. I must admit ",
                 "that in the past most walls I would hit would lead me on to the next big idea. Nowadays I am developing a project integrating most of ",
                 "my amazing ideas of the past years, trying to improve school life of kids that are in the final years before graduation. More to read down below!",
@@ -255,8 +285,8 @@
             }
         ],
         "links": {
-            "linkedin": "https://www.linkedin.com/in/your-handle",
-            "github": "https://github.com/your-handle",
+            "linkedin": "https://www.linkedin.com/in/kaspar-besthorn-b51a3a386",
+            "github": "https://www.github.com/KasparBes",
             "hackerrank": "https://www.hackerrank.com/your-handle",
             "leetcode": "https://leetcode.com/your-handle"
         },
@@ -266,27 +296,27 @@
         },
         "story": {
             "programming": [
-                { "date":"2013","title":"First Introduction to programming","summary":"Scratch","details":[],"links":[]},
-                { "date":"2015","title":"Php application-server","details":"PHP"},
+                { "date":"2013","title":"First Introduction to programming","summary":"Scratch"},
+                { "date":"2015","title":"Php application-server","summary":"PHP"},
                 { "date":"2016","title":"Database mysql programming","summary":"SQL"},
-                { "date":"2017","title":"Linux & Raspberry Pi hacking","summary":"Node + Express + SQL.","details":"REST APIs, auth, migrations, logging."},
-                { "date":"2020","title":"Webpages","summary":"Node + Express + SQL.","details":"REST APIs, auth, migrations, logging."},
-                { "date":"2021","title":"Philips Hue Home Automation","summary":"Node + Express + SQL.","details":"REST APIs, auth, migrations, logging."},
-                { "date":"2023","title":"Discord Bot","summary":"Node + Express + SQL.","details":"REST APIs, auth, migrations, logging."},
-                { "date":"2025","title":"Godot Study Game","summary":"Node + Express + SQL.","details":"REST APIs, auth, migrations, logging."}
+                { "date":"2017","title":"Linux & Raspberry Pi hacking"},
+                { "date":"2020","title":"Webpages","summary":"PHP, JS, HTML, CSS"},
+                { "date":"2021","title":"Philips Hue Home Automation","summary":"API, PHP"},
+                { "date":"2023","title":"Discord Bot","summary":"PHP, libraries","details": "I developed a discord bot to help with the game mode skyblock on the server hypixel. It was a bot that used API data to calculate player efficiency."},
+                { "date":"2025","title":"Godot Study Game","summary":"Godot","details": "This is my current project. I want to improve the concept of homework through connecting teachers and students via a platform, where students have Gamification logic to be more motivated. Stay tuned!"}
             ],
             "chess": [
-                { "date":"2021","title":"Started Playing Chess Online","summary":"Blitz with friends.","details":"Accuracy tracking + friendly rivalry.","links":[{"text":"Profile","href":"https://www.chess.com/member/clickybtw"}]},
-                { "date":"2022","title":"House Championship","summary":"Daily puzzles; fewer traps.","details":"Switched to annotated rapid games."},
-                { "date":"2024","title":"First Tournament","summary":"Local events + FIDE ID.","details":"Classical games = patience + time mgmt."},
-                { "date":"2024","title":"Won Hamburg school chess championship","summary":"Local events + FIDE ID.","details":"Classical games = patience + time mgmt."},
-                { "date":"2024","title":"Participated in German school chess championship","summary":"Local events + FIDE ID.","details":"Classical games = patience + time mgmt."}
+                { "date":"2021","title":"Started Playing Chess Online"},
+                { "date":"2022","title":"House Championship","details":"In my year abroad, we had a contest with a team of four against other houses."},
+                { "date":"2024","title":"First Tournament"},
+                { "date":"2024","title":"Won Hamburg school chess championship"},
+                { "date":"2024","title":"Participated in German school chess championship"}
             ]
         },
         "hobbies": [
-            {"title":"Hockey","date":"2024-06","tags":["Programming","Chess"],"summary":"PGN viewer with stepper.","details":"Bitboards & UI experiments.","link":"#"},
-            {"title":"Skating","date":"2023-10","tags":["Chess"],"summary":"Short, practical lines.","details":"One novelty per line."},
-            {"title":"Tennis","date":"2022-02","tags":["Programming"],"summary":"Tiny TUI for daily streaks.","details":"CSV + git, no cloud.","link":"#"}
+            {"title":"Hockey"},
+            {"title":"Skating"},
+            {"title":"Tennis"}
         ]
     }
 </script>
@@ -382,7 +412,9 @@
         items.forEach((it,i)=>{
             const card=el('div','tevent');
             const meta=el('div','tmeta'); meta.textContent=it.date||'';
-            const title=el('div','title'); title.innerHTML = `${it.title||''} — <span class="muted">${it.summary||''}</span>`;
+            let summarytext = ""
+            if(it.summary){summarytext = "("+it.summary+")"}
+            const title=el('div','title'); title.innerHTML = `${it.title||''}  <span class="muted">${summarytext}</span>`;
             card.append(meta,title);
 
             if(it.details || (it.links && it.links.length)){
@@ -502,14 +534,17 @@
             setText('#about-text', bioText);
 
             // Skills / Projects / Links
-            renderSkills(cfg.skills || []); renderProjects(cfg.projects || []); renderLinks(cfg.links || {});
+            //renderSkills(cfg.skills || []);
+            //renderProjects(cfg.projects || []);
+            const links = Object.fromEntries(Object.entries(cfg.links || {}).slice(0, 2));
+            renderLinks(links);
 
             // Timelines (side-by-side)
             renderTimeline(cfg.story?.programming || [], '#prog-tl');
             renderTimeline(cfg.story?.chess || [], '#chess-tl');
 
             // Hobbies
-            setupHobbyFilters(cfg.hobbies || []); renderHobbies(cfg.hobbies || []);
+            //setupHobbyFilters(cfg.hobbies || []); renderHobbies(cfg.hobbies || []);
 
             // Chess
             maybeShowCORSWarning(); renderFide(cfg.chess?.fideid || ''); renderChessCom(cfg.chess?.chesscom || '');
